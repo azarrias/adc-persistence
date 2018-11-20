@@ -1,5 +1,6 @@
 package es.pue.android.persistence;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,8 +9,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    EditText etName;
+    EditText etSurname;
+    TextView txtResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,14 +25,39 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        etName = (EditText) findViewById(R.id.etName);
+        etSurname = (EditText) findViewById(R.id.etSurname);
+        txtResult = (TextView) findViewById(R.id.txtResult);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                String fullName;
+                if (etName.length() > 0 && etSurname.length() > 0) {
+                    fullName = etName.getText().toString() + " " + etSurname.getText().toString();
+                } else {
+                    fullName = "Input is not set";
+                }
+                txtResult.setText(fullName);
+                saveResult(fullName);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences pref = getSharedPreferences("File", MODE_PRIVATE);
+        String result = pref.getString("name", "");
+        txtResult.setText(result);
+    }
+
+    private void saveResult(String fullName) {
+        SharedPreferences pref = getSharedPreferences("File", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("name", fullName);
+        editor.commit();
     }
 
     @Override
